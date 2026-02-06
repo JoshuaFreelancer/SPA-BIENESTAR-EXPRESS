@@ -1,81 +1,97 @@
-import React from "react";
-
-function PaginationNav({ currentPage, itemsPerPage, totalItems }) {
-  // Calcular el número total de páginas
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-  // Generar los enlaces de navegación para cada página
+function PaginationNav({ currentPage, totalPages, onPageChange }) {
+  // Generamos el array de números de página
   const pages = [];
+
+  // Nota: Si tienes muchísimas páginas (ej. 100), aquí deberíamos implementar
+  // una lógica de "ventana" (1, 2, 3 ... 10). Por ahora, renderizamos todas.
   for (let i = 1; i <= totalPages; i++) {
-    pages.push(
-      <li key={i}>
-        <a
-          href={`#page-${i}`}
-          className={`font-kodchasan flex items-center justify-center text-sm z-10 py-2 px-3 leading-tight ${
-            i === currentPage
-              ? "text-primary-600 bg-primary-50 border border-primary-300 hover:bg-primary-100 hover:text-primary-700 "
-              : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-          }`}
-        >
-          {i}
-        </a>
-      </li>
-    );
+    pages.push(i);
   }
 
   return (
-    <nav
-      className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
-      aria-label="Table navigation"
-    >
-      <ul className="inline-flex items-stretch -space-x-px">
-        {/* Botón de página anterior */}
+    <nav aria-label="Navegación de inventario">
+      <ul className="inline-flex items-center -space-x-px h-8 text-sm">
+        {/* --- BOTÓN ANTERIOR --- */}
         <li>
-          <a
-            href="#"
-            className="font-kodchasan flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          <button
+            type="button"
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`font-kodchasan flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg 
+              ${
+                currentPage === 1
+                  ? "opacity-50 cursor-not-allowed bg-gray-100"
+                  : "hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              }`}
           >
             <span className="sr-only">Anterior</span>
             <svg
-              className="w-5 h-5"
+              className="w-2.5 h-2.5 rtl:rotate-180"
               aria-hidden="true"
-              fill="currentColor"
-              viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
             >
               <path
-                fillRule="evenodd"
-                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                clipRule="evenodd"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 1 1 5l4 4"
               />
             </svg>
-          </a>
+          </button>
         </li>
 
-        {/* Enlaces de las páginas */}
-        {pages}
+        {/* --- NÚMEROS DE PÁGINA --- */}
+        {pages.map((page) => (
+          <li key={page}>
+            <button
+              type="button"
+              onClick={() => onPageChange(page)}
+              aria-current={page === currentPage ? "page" : undefined}
+              className={`font-kodchasan flex items-center justify-center px-3 h-8 leading-tight border transition-colors
+                ${
+                  page === currentPage
+                    ? "z-10 text-white bg-[#239089] border-[#239089] hover:bg-[#1b726d]" // Estilo Activo (Tu color Teal)
+                    : "text-gray-500 bg-white border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" // Estilo Inactivo
+                }`}
+            >
+              {page}
+            </button>
+          </li>
+        ))}
 
-        {/* Botón de página siguiente */}
+        {/* --- BOTÓN SIGUIENTE --- */}
         <li>
-          <a
-            href="#"
-            className="font-kodchasan flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          <button
+            type="button"
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages || totalPages === 0}
+            className={`font-kodchasan flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg 
+              ${
+                currentPage === totalPages || totalPages === 0
+                  ? "opacity-50 cursor-not-allowed bg-gray-100"
+                  : "hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              }`}
           >
             <span className="sr-only">Siguiente</span>
             <svg
-              className="w-5 h-5"
+              className="w-2.5 h-2.5 rtl:rotate-180"
               aria-hidden="true"
-              fill="currentColor"
-              viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
             >
               <path
-                fillRule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10l-3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clipRule="evenodd"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 9 4-4-4-4"
               />
             </svg>
-          </a>
+          </button>
         </li>
       </ul>
     </nav>

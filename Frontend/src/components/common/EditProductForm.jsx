@@ -17,7 +17,7 @@ function EditProductForm({ _id, name, category, stock, price, img }) {
     const myHeaders = new Headers();
     myHeaders.append('Content-Type', 'application/json');
 
-    await fetch('http://localhost:5000/api/productos/updateProd/'+_id, {
+    await fetch('http://localhost:5000/api/products/updateProd/'+_id, {
       method: 'PUT',
       headers: myHeaders,
       body: JSON.stringify(product)

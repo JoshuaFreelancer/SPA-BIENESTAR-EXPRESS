@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const app = require('./app');
 
-// 1. Cargar variables de entorno
+// 1. Cargar variables de entorno INMEDIATAMENTE
+// Esto garantiza que cualquier archivo importado después ya vea las variables
 dotenv.config();
+
+// Ahora sí importamos app, porque app ya podrá leer el .env
+const app = require('./app');
 
 const PORT = process.env.PORT || 5000;
 const URI = process.env.MONGO_URI;
@@ -14,10 +17,12 @@ if (!URI) {
   process.exit(1);
 }
 
+// Opcional: Debug rápido para estar seguros de Cloudinary (bórralo después)
+console.log('¿Cloudinary detectado?:', process.env.CLOUDINARY_URL ? 'SÍ' : 'NO');
+
 // 3. Función de conexión profesional
 const startServer = async () => {
   try {
-    // Configuraciones de Mongoose para evitar warnings en versiones modernas
     mongoose.set('strictQuery', false);
 
     console.log('Conectando a MongoDB Atlas...');
@@ -25,7 +30,6 @@ const startServer = async () => {
     
     console.log('✅ Conexión exitosa a la base de datos');
 
-    // 4. Arrancar Express solo si la DB conectó
     app.listen(PORT, () => {
       console.log('---');
       console.log(`🚀 Servidor listo en: http://localhost:${PORT}`);
@@ -40,7 +44,6 @@ const startServer = async () => {
   }
 };
 
-// Capturar errores no manejados fuera de la función principal
 process.on('unhandledRejection', (err) => {
   console.log(`Error no manejado: ${err.message}`);
   process.exit(1);

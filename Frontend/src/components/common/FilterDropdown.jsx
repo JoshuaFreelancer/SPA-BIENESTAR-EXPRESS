@@ -1,77 +1,107 @@
-import React from 'react';
-import useDropdown from '../../hooks/useDropdown';
+import React from "react";
+import useDropdown from "../../hooks/useDropdown";
 
-function FilterDropdown() {
-  const { isOpen, toggleDropdown, closeDropdowns } = useDropdown(false);
+function FilterDropdown({ currentFilter, onFilterChange }) {
+  // 1. Destructuramos dropdownRef
+  const { isOpen, toggleDropdown, closeDropdowns, dropdownRef } =
+    useDropdown(false);
+
+  // Lista de filtros predefinidos
+  const filters = [
+    { label: "Ver Todos", value: "all" },
+    { label: "Bajo Stock (< 10)", value: "low_stock" },
+    { label: "Agotados (0)", value: "out_of_stock" },
+    { label: "Más Caros", value: "high_price" },
+  ];
+
+  const handleSelection = (value) => {
+    if (onFilterChange) onFilterChange(value);
+    // MEJORA UX: Al ser selección única (radio), cerramos el menú al elegir
+    closeDropdowns();
+  };
 
   return (
-    <>
+    // 2. Conectamos la referencia al div contenedor
+    <div className="relative" ref={dropdownRef}>
+      {/* Botón del Filtro */}
       <button
         id="filterDropdownButton"
         onClick={toggleDropdown}
-        onBlur={closeDropdowns}
-        className="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-kodchasan font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+        className={`flex items-center justify-center py-2 px-4 text-sm font-kodchasan font-medium focus:outline-none rounded-lg border focus:z-10 focus:ring-4 transition-colors
+          ${
+            isOpen
+              ? "bg-primary-50 text-primary-700 border-primary-500 ring-primary-200"
+              : "bg-white text-gray-900 border-gray-200 hover:bg-gray-100 hover:text-primary-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+          }`}
         type="button"
       >
         <svg
-          xmlns="http://www.w3.org/2000/svg"
+          className="w-4 h-4 mr-2"
           aria-hidden="true"
-          className="h-4 w-4 mr-2 text-gray-400"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-            clipRule="evenodd"
-          />
-        </svg>
-        Filtro
-        <svg
-          className="-mr-1 ml-1.5 w-5 h-5"
+          xmlns="http://www.w3.org/2000/svg"
           fill="currentColor"
           viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
         >
-          <path
-            clipRule="evenodd"
-            fillRule="evenodd"
-            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-          />
+          <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
         </svg>
+        Filtros
+        {currentFilter !== "all" && currentFilter && (
+          <span className="ml-2 w-2 h-2 bg-primary-600 rounded-full"></span>
+        )}
       </button>
+
+      {/* Menú Desplegable */}
       {isOpen && (
         <div
           id="filterDropdown"
-          className="absolute z-10 right-0 top-14 mt-2 w-48 p-3 bg-white rounded-lg shadow dark:bg-gray-700"
+          className="absolute z-50 right-0 mt-2 w-56 p-3 bg-white rounded-lg shadow-xl dark:bg-gray-700 border border-gray-100 dark:border-gray-600 animate-fade-in"
         >
-          <h6 className="mb-3 text-sm font-medium text-gray-900 dark:text-white">
-            Elige Cantidad
+          <h6 className="mb-3 text-sm font-bold text-gray-900 dark:text-white font-kodchasan">
+            Estado del Inventario
           </h6>
           <ul
             className="space-y-2 text-sm"
             aria-labelledby="filterDropdownButton"
           >
-            <li className="flex items-center">
-              <input
-                id="apple"
-                type="checkbox"
-                value=""
-                className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-              />
-              <label
-                htmlFor="apple"
-                className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
+            {filters.map((filter) => (
+              <li
+                key={filter.value}
+                className="flex items-center hover:bg-gray-50 dark:hover:bg-gray-600 rounded p-1 transition-colors"
               >
-                Apple (56)
-              </label>
-            </li>
-            {/* Agrega más elementos de la lista aquí si es necesario */}
+                <input
+                  id={`filter-${filter.value}`}
+                  type="radio"
+                  name="inventory_filter"
+                  value={filter.value}
+                  checked={currentFilter === filter.value}
+                  onChange={() => handleSelection(filter.value)}
+                  className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 dark:bg-gray-600 dark:border-gray-500 cursor-pointer"
+                />
+                <label
+                  htmlFor={`filter-${filter.value}`}
+                  className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer w-full font-kodchasan"
+                >
+                  {filter.label}
+                </label>
+              </li>
+            ))}
           </ul>
+
+          {/* Botón para limpiar filtros */}
+          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+            <button
+              onClick={() => {
+                handleSelection("all");
+                // closeDropdowns(); // Ya se cierra en handleSelection
+              }}
+              className="text-xs font-medium text-primary-600 hover:text-primary-800 dark:text-primary-400 hover:underline w-full text-center"
+            >
+              Limpiar filtros
+            </button>
+          </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
 

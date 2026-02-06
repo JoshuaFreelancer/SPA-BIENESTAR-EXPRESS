@@ -1,17 +1,28 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-const useInputState = (initialValue) => {
+const useInputState = (initialValue = "") => {
   const [value, setValue] = useState(initialValue);
 
   const handleChange = (e) => {
-    setValue(e.target.value);
+    // Maneja tanto eventos (e.target.value) como valores directos
+    setValue(e && e.target ? e.target.value : e);
   };
 
   const reset = () => {
-    setValue('');
+    setValue(initialValue);
   };
 
-  return [value, handleChange, reset];
+  return {
+    value,
+    onChange: handleChange,
+    reset,
+    setValue,
+    // Helper para conectar rápido: <input {...bind} />
+    bind: {
+      value,
+      onChange: handleChange,
+    },
+  };
 };
 
 export default useInputState;
