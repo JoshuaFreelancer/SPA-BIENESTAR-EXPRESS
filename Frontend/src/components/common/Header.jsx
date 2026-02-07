@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast"; // 1. Importar Toast
 import LoginForm from "../auth/LoginForm";
 import RegisterForm from "../auth/RegisterForm";
+import User from "./User"; // 2. Importar el componente User Dropdown
 
 const Header = () => {
   // Estados para modales
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
 
-  // Estado para saber si hay usuario (Simulación de sesión)
+  // Estado del usuario
   const [user, setUser] = useState(null);
 
-  // Al cargar la página, verificamos si hay un usuario guardado en el navegador
+  // Cargar usuario al inicio
   useEffect(() => {
-    const storedUser = localStorage.getItem("user"); // Asumiendo que guardaste el objeto usuario al loguearte
+    const storedUser = localStorage.getItem("user");
     const token = localStorage.getItem("auth-token");
 
     if (storedUser && token) {
@@ -20,18 +22,49 @@ const Header = () => {
     }
   }, []);
 
+  // 3. LOGOUT CON TOAST ELEGANTE
   const handleLogout = () => {
-    if (window.confirm("¿Deseas cerrar sesión?")) {
-      localStorage.removeItem("auth-token");
-      localStorage.removeItem("user");
-      setUser(null);
-      window.location.reload(); // Recargamos para limpiar estados de la app
-    }
+    toast((t) => (
+      <div className="flex flex-col gap-2 font-kodchasan">
+        <span className="font-semibold text-gray-800">
+          ¿Cerrar sesión?
+        </span>
+        <div className="flex gap-2 mt-1">
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              performLogout();
+            }}
+            className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition-colors"
+          >
+            Salir
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="bg-gray-100 text-gray-800 px-3 py-1 rounded-md text-sm hover:bg-gray-200 transition-colors"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: 5000,
+      icon: '👋',
+    });
   };
 
+  const performLogout = () => {
+    localStorage.removeItem("auth-token");
+    localStorage.removeItem("user");
+    setUser(null);
+    toast.success("Has cerrado sesión correctamente");
+    // Opcional: window.location.reload(); si necesitas limpiar estados globales complejos
+  };
+
+  // Helpers para abrir modales
   const openLogin = () => {
-    setShowLoginForm(true);
     setShowRegisterForm(false);
+    setShowLoginForm(true);
   };
 
   const openRegister = () => {
@@ -40,71 +73,68 @@ const Header = () => {
   };
 
   return (
-    // Usamos bg-primary-200/500 en lugar de hex codes para consistencia con tu Tailwind config
-    <header className="bg-primary-100 border-b-4 border-primary-500 shadow-sm dark:bg-gray-900 dark:border-primary-900">
+    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-30 font-kodchasan">
       <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
-        {/* LOGO Y TÍTULO */}
-        <div className="flex items-center space-x-4">
+        
+        {/* LOGO E IDENTIDAD */}
+        <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => window.location.reload()}>
           <img
             src="/assets/images/Logo.png"
             alt="Bienestar Express Logo"
-            className="h-12 w-auto object-contain hover:scale-105 transition-transform duration-300"
+            className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
           />
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white uppercase font-kodchasan tracking-tight">
-            Bienestar <span className="text-primary-600">Express</span>
-          </h1>
+          <div className="flex flex-col">
+             <h1 className="text-xl font-bold text-gray-800 leading-tight tracking-tight">
+              BIENESTAR <span className="text-primary-600">EXPRESS</span>
+            </h1>
+            <span className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">
+              Gestión Farmacéutica
+            </span>
+          </div>
         </div>
 
-        {/* ÁREA DE USUARIO */}
+        {/* ÁREA DE ACCIONES DE USUARIO */}
         <div className="flex items-center gap-3">
           {user ? (
-            // VISTA: USUARIO LOGUEADO
-            <div className="flex items-center gap-4 animate-fade-in">
-              <span className="text-gray-700 dark:text-gray-200 font-kodchasan font-medium text-sm sm:text-base">
-                Hola,{" "}
-                <span className="text-primary-700 dark:text-primary-400 font-bold">
-                  {user.name}
-                </span>
-              </span>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 hover:text-red-700 focus:z-10 focus:ring-2 focus:ring-red-200 transition-colors"
-              >
-                Salir
-              </button>
-            </div>
+            // VISTA: USUARIO LOGUEADO (Componente User)
+            <User 
+                user={user} 
+                onLogout={handleLogout} 
+            />
           ) : (
-            // VISTA: INVITADO (LOGIN/REGISTER)
-            <div className="flex gap-2 animate-fade-in">
+            // VISTA: INVITADO
+            <div className="flex gap-3 animate-fade-in">
               <button
                 onClick={openLogin}
-                className="px-5 py-2 text-sm font-medium text-primary-700 bg-white border border-primary-200 rounded-lg hover:bg-primary-50 hover:text-primary-800 transition-colors shadow-sm"
+                className="px-4 py-2 text-sm font-bold text-gray-600 hover:text-primary-700 bg-transparent hover:bg-primary-50 rounded-lg transition-all"
               >
-                Iniciar sesión
+                Iniciar Sesión
               </button>
               <button
                 onClick={openRegister}
-                className="px-5 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 transition-colors shadow-md"
+                className="px-5 py-2 text-sm font-bold text-white bg-primary-600 rounded-lg hover:bg-primary-700 hover:shadow-lg"
               >
-                Registrarse
+                Crear Cuenta
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* MODALES */}
-      {/* Pasamos 'setUser' al LoginForm para que actualice el header al loguearse exitosamente */}
+      {/* --- MODALES CONECTADOS --- */}
+      
       <LoginForm
         showModal={showLoginForm}
         setShowModal={setShowLoginForm}
-        switchToRegister={openRegister} // Simplificado: pasamos la función directa
-        onLoginSuccess={(userData) => setUser(userData)} // Callback para actualizar estado inmediato
+        // AQUÍ ESTABA EL ERROR: Ahora pasamos setShowRegisterForm al prop correcto
+        setShowRegisterModal={setShowRegisterForm} 
+        onLoginSuccess={(userData) => setUser(userData)}
       />
 
       <RegisterForm
         showModal={showRegisterForm}
         setShowModal={setShowRegisterForm}
+        // Pasamos la función para volver al login
         switchToLogin={openLogin}
       />
     </header>

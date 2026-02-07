@@ -1,4 +1,3 @@
-import React from "react";
 import SearchBar from "./SearchBar";
 import ProductForm from "./ProductForm";
 import ActionsDropdown from "./ActionsDropdown";
@@ -41,7 +40,7 @@ function InventoryTable({
           {/* Tabla */}
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-[#1E1E1E] font-bold uppercase bg-[#239089] border-b dark:bg-gray-700 dark:text-gray-400">
+              <thead className="text-xs text-white font-bold uppercase bg-[#239089] border-b dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" className="px-4 py-3">
                     Producto
@@ -58,7 +57,7 @@ function InventoryTable({
                   <th scope="col" className="px-4 py-3 text-center">
                     Imagen
                   </th>
-                  <th scope="col" className="px-4 py-3 text-right">
+                  <th scope="col" className="px-4 py-3 text-center">
                     Acciones
                   </th>
                 </tr>

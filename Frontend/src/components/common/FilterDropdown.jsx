@@ -1,106 +1,130 @@
-import React from "react";
-import useDropdown from "../../hooks/useDropdown";
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+import useDropdown from '../../hooks/useDropdown';
 
 function FilterDropdown({ currentFilter, onFilterChange }) {
-  // 1. Destructuramos dropdownRef
-  const { isOpen, toggleDropdown, closeDropdowns, dropdownRef } =
-    useDropdown(false);
+  const { isOpen, toggleDropdown, closeDropdowns, dropdownRef } = useDropdown(false);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
-  // Lista de filtros predefinidos
   const filters = [
     { label: "Ver Todos", value: "all" },
     { label: "Bajo Stock (< 10)", value: "low_stock" },
     { label: "Agotados (0)", value: "out_of_stock" },
-    { label: "Más Caros", value: "high_price" },
+    { label: "Más Caros (> $50)", value: "high_price" }
   ];
 
+  const handleToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // Evita que otros eventos se disparen
+    
+    if (!isOpen) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setMenuPosition({
+            top: rect.bottom + window.scrollY + 5,
+            left: rect.right + window.scrollX,
+        });
+    }
+    toggleDropdown();
+  };
+
   const handleSelection = (value) => {
+    console.log("Filtro seleccionado:", value); // Debug
     if (onFilterChange) onFilterChange(value);
-    // MEJORA UX: Al ser selección única (radio), cerramos el menú al elegir
     closeDropdowns();
   };
 
+  // Contenido del Portal
+  const dropdownMenu = (
+    <>
+      {/* 1. BACKDROP: Detecta clic fuera y cierra el menú */}
+      <div 
+        className="fixed inset-0 z-[60] bg-transparent" 
+        onMouseDown={() => closeDropdowns()} // Usamos onMouseDown para ser más rápidos que el click
+      ></div>
+
+      {/* 2. MENÚ FLOTANTE */}
+      <div 
+        className="fixed z-[70] w-64 bg-white rounded-xl shadow-xl border border-gray-100 animate-fade-in-up origin-top-right overflow-hidden font-kodchasan"
+        style={{ 
+            top: `${menuPosition.top}px`,
+            left: `${menuPosition.left}px`,
+            transform: 'translateX(-100%)'
+        }}
+        // IMPORTANTE: Detenemos la propagación aquí para que el hook useDropdown 
+        // no piense que dimos clic "fuera" del componente.
+        onMouseDown={(e) => e.stopPropagation()} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ul className="py-1">
+          {filters.map((filter) => {
+            const isSelected = currentFilter === filter.value;
+            
+            return (
+              <li key={filter.value}>
+                <button
+                  type="button" // Importante especificar type button
+                  onClick={() => handleSelection(filter.value)}
+                  className={`w-full text-left px-4 py-3 text-sm flex items-center justify-between transition-colors
+                    ${isSelected 
+                      ? "bg-primary-50 text-primary-800 font-bold" 
+                      : "text-gray-700 hover:bg-gray-50 hover:text-primary-600"
+                    }`}
+                >
+                  <span>{filter.label}</span>
+                  
+                  {isSelected && (
+                    <svg className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        
+        {/* Footer Restablecer */}
+        {currentFilter !== 'all' && (
+          <div className="border-t border-gray-100 bg-gray-50 p-2">
+             <button 
+                type="button"
+                onClick={() => handleSelection('all')}
+                className="w-full py-1.5 text-xs font-bold text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors flex items-center justify-center gap-1"
+             >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                Restablecer filtros
+             </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+
   return (
-    // 2. Conectamos la referencia al div contenedor
-    <div className="relative" ref={dropdownRef}>
-      {/* Botón del Filtro */}
+    <div ref={dropdownRef}>
       <button
-        id="filterDropdownButton"
-        onClick={toggleDropdown}
-        className={`flex items-center justify-center py-2 px-4 text-sm font-kodchasan font-medium focus:outline-none rounded-lg border focus:z-10 focus:ring-4 transition-colors
-          ${
-            isOpen
-              ? "bg-primary-50 text-primary-700 border-primary-500 ring-primary-200"
-              : "bg-white text-gray-900 border-gray-200 hover:bg-gray-100 hover:text-primary-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+        onClick={handleToggle}
+        className={`flex items-center justify-center py-2 px-4 text-sm font-kodchasan font-medium focus:outline-none rounded-lg border transition-all duration-200
+          ${isOpen 
+            ? "bg-primary-50 text-primary-700 border-primary-500 ring-4 ring-primary-100" 
+            : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:text-primary-700 hover:border-primary-300"
           }`}
         type="button"
       >
-        <svg
-          className="w-4 h-4 mr-2"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
+        <svg className="w-4 h-4 mr-2 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7.75 4H19M7.75 4a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 4h2.25m13.5 6H19m-2.25 0a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 10h11.25m-4.5 6H19M7.75 16a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 16h2.25"/>
         </svg>
         Filtros
-        {currentFilter !== "all" && currentFilter && (
-          <span className="ml-2 w-2 h-2 bg-primary-600 rounded-full"></span>
+        
+        {currentFilter !== 'all' && (
+           <span className="ml-2 flex h-2 w-2 relative">
+             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+             <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-600"></span>
+           </span>
         )}
       </button>
 
-      {/* Menú Desplegable */}
-      {isOpen && (
-        <div
-          id="filterDropdown"
-          className="absolute z-50 right-0 mt-2 w-56 p-3 bg-white rounded-lg shadow-xl dark:bg-gray-700 border border-gray-100 dark:border-gray-600 animate-fade-in"
-        >
-          <h6 className="mb-3 text-sm font-bold text-gray-900 dark:text-white font-kodchasan">
-            Estado del Inventario
-          </h6>
-          <ul
-            className="space-y-2 text-sm"
-            aria-labelledby="filterDropdownButton"
-          >
-            {filters.map((filter) => (
-              <li
-                key={filter.value}
-                className="flex items-center hover:bg-gray-50 dark:hover:bg-gray-600 rounded p-1 transition-colors"
-              >
-                <input
-                  id={`filter-${filter.value}`}
-                  type="radio"
-                  name="inventory_filter"
-                  value={filter.value}
-                  checked={currentFilter === filter.value}
-                  onChange={() => handleSelection(filter.value)}
-                  className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 dark:bg-gray-600 dark:border-gray-500 cursor-pointer"
-                />
-                <label
-                  htmlFor={`filter-${filter.value}`}
-                  className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer w-full font-kodchasan"
-                >
-                  {filter.label}
-                </label>
-              </li>
-            ))}
-          </ul>
-
-          {/* Botón para limpiar filtros */}
-          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-            <button
-              onClick={() => {
-                handleSelection("all");
-                // closeDropdowns(); // Ya se cierra en handleSelection
-              }}
-              className="text-xs font-medium text-primary-600 hover:text-primary-800 dark:text-primary-400 hover:underline w-full text-center"
-            >
-              Limpiar filtros
-            </button>
-          </div>
-        </div>
-      )}
+      {isOpen && createPortal(dropdownMenu, document.body)}
     </div>
   );
 }

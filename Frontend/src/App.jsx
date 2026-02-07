@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Toaster } from "react-hot-toast";
 import Header from "./components/common/Header";
 import InventoryTable from "./components/common/InventoryTable";
 import "./App.css";
@@ -21,7 +22,7 @@ function App() {
 
   // Estado para el filtro
   const [currentFilter, setCurrentFilter] = useState("all");
-  // Estado para la búsqueda (Importante para que funcione el SearchBar)
+  // Estado para la búsqueda
   const [searchTerm, setSearchTerm] = useState("");
 
   // Función para obtener datos
@@ -29,7 +30,6 @@ function App() {
     setIsLoading(true);
     setError(null);
     try {
-      // Construimos la URL con Paginación, Filtro y Búsqueda
       let url = `${API_URL}/api/products?page=${currentPage}&limit=10`;
 
       if (filterValue && filterValue !== "all") {
@@ -60,7 +60,7 @@ function App() {
     }
   };
 
-  // Efecto Maestro: Se dispara si cambia página, filtro O búsqueda
+  // Efecto Maestro
   useEffect(() => {
     fetchProducts(page, currentFilter, searchTerm);
   }, [page, currentFilter, searchTerm]);
@@ -120,16 +120,49 @@ function App() {
   }
 
   return (
-    // AQUÍ ESTÁ EL CAMBIO DE FONDO
     <div
       className="min-h-screen font-kodchasan"
       style={{
-        // Color base: Un verde azulado muy pálido (casi blanco)
         backgroundColor: "#f0fdfa",
-        // Patrón: Pequeñas cruces médicas (+) generadas por SVG
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23239089' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
       }}
     >
+      {/* 2. AGREGAMOS EL TOASTER CONFIGURADO CON TUS COLORES */}
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          className: "font-kodchasan font-medium",
+          style: {
+            borderRadius: "12px",
+            background: "#fff",
+            color: "#134e4a", // primary-900
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+          },
+          // Estilo para Éxito
+          success: {
+            iconTheme: {
+              primary: "#0d9488", // primary-600
+              secondary: "#f0fdfa", // primary-50
+            },
+            style: {
+              border: "1px solid #ccfbf1", // primary-100
+            },
+          },
+          // Estilo para Error
+          error: {
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#fff",
+            },
+            style: {
+              border: "1px solid #fee2e2",
+            },
+          },
+        }}
+      />
+
       <Header />
 
       <main className="container mx-auto px-4 py-8">
@@ -165,10 +198,9 @@ function App() {
             products={products}
             onDelete={handleProductDeleted}
             onRefresh={handleRefresh}
-            // Pasamos los props de filtrado y búsqueda
             currentFilter={currentFilter}
             onFilterChange={handleFilterChange}
-            onSearch={handleSearch} // <--- Asegúrate de que InventoryTable reciba esto
+            onSearch={handleSearch}
             pagination={{
               page: page,
               totalPages: totalPages,
