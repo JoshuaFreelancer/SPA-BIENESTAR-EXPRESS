@@ -117,4 +117,4 @@ Puedes ver el proceso de diseño UI/UX en nuestro Figma:
 
 Este proyecto fue desarrollado con ❤️ por:
 
-- [@JoshuaFreelancer](https://github.com/Joshua-desings) | 🔧 FullStack Developer
+- [@JoshuaFreelancer](https://github.com/JoshuaFreelancer) | 🔧 FullStack Developer
