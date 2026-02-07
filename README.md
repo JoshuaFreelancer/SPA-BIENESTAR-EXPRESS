@@ -1,58 +1,120 @@
+# 🏥 Bienestar Express - Sistema de Gestión Farmacéutica
 
-# Bienestar Express 
+**Bienestar Express** es una plataforma integral diseñada para la administración eficiente de inventarios farmacéuticos. Desarrollada con el stack MERN (MongoDB, Express, React, Node.js), ofrece una experiencia de usuario moderna, rápida y segura.
 
-Aplicacion para la administración de farmacos de una empresa llamada "Bienestar Express"; con caracteristicas de base de datos MongoDB Atlas, y utilizando React Vite y node.js.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
 
-## Instalación
+---
 
-Instalar la aplicacion utilizando node.js, para descargar las dependecias del proyecto (se debe realizar en el directorio de /Backend y el de /Frontend).
+## 🚀 Características Principales
+
+Este sistema no es solo un CRUD, incluye funcionalidades avanzadas:
+
+- **🔐 Autenticación y Seguridad:** Sistema de Login/Registro con JWT. Protección de rutas y "Modo Lectura" para usuarios invitados.
+- **📦 Gestión de Inventario:** Crear, Editar (con carga de imágenes), Eliminar y Visualizar productos.
+- **🔍 Búsqueda y Filtrado Avanzado:** Buscador en tiempo real y filtros inteligentes (Stock crítico, Precio, Categoría).
+- **📊 Reportes:** Exportación de inventario a CSV y opción de impresión nativa.
+- **⚡ UX/UI Moderna:** Interfaz reactiva con Tailwind CSS, notificaciones Toast, Modals con Portals y Loaders personalizados.
+- **📱 Diseño Responsivo:** Adaptable a móviles y escritorio.
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+### Frontend
+
+- **React + Vite:** Para una construcción rápida y optimizada.
+- **Tailwind CSS:** Para un diseño moderno y responsive.
+- **React Hot Toast:** Para notificaciones elegantes.
+- **Custom Hooks:** Para el manejo del estado global y lógica reutilizable.
+
+### Backend
+
+- **Node.js + Express:** API RESTful robusta.
+- **MongoDB Atlas:** Base de datos NoSQL en la nube.
+- **Mongoose:** Modelado de datos.
+- **JWT & Bcrypt:** Seguridad y encriptación.
+
+---
+
+## ⚙️ Instalación y Configuración
+
+Sigue estos pasos para correr el proyecto localmente.
+
+### 1. Clonar el repositorio
 
 ```bash
-  npm i
+git clone [https://github.com/Joshua-desings/Bienestar-Express.git](https://github.com/Joshua-desings/Bienestar-Express.git)
+cd Bienestar-Express
+
 ```
 
-## Generación de la Build
-
-Generar el proyecto construido con Webpack en el directorio de /Frontend.
+### 2. Configurar el Backend (Servidor)
 
 ```bash
-  npm build
-```
-    
-## Correr el proyecto en dev
+cd Backend
+npm install
 
-Corre el proyecto utilizando una versión de desarrollo en el directorio de /Frontend.
+```
+
+**⚠️ Importante:** Crea un archivo `.env` en la carpeta `/Backend` con las siguientes variables:
+
+```env
+PORT=5000
+DB_URI=tu_string_de_conexion_mongodb_atlas
+SECRET_KEY=tu_palabra_secreta_jwt
+
+```
+
+Para iniciar el servidor:
 
 ```bash
-  npm run dev
+npm start
+# O para desarrollo con nodemon:
+npm run dev
+
 ```
 
-## Correr el servidor de la API
+### 3. Configurar el Frontend (Cliente)
 
-Corre el servidor en el directorio de /Backend.
+Abre una nueva terminal y ve a la carpeta del frontend:
 
 ```bash
-  npm start
+cd Frontend
+npm install
+
 ```
 
-## Herramientas utilizadas en el desarrollo
+**⚠️ Importante:** Crea un archivo `.env` en la carpeta `/Frontend`:
 
-- [React](https://es.react.dev/) + [Vite](https://vitejs.dev/): React es una biblioteca de JavaScript para crear interfaces de usuario. Vite es una herramienta de desarrollo web que ofrece un rápido arranque, actualización instantánea de módulos y optimización de producción. Juntos, permiten crear aplicaciones web modernas y eficientes.
+```env
+VITE_API_URL=http://localhost:5000
 
-- [Node.js](https://nodejs.org/en): Node.js es un entorno de ejecución de JavaScript que permite ejecutar código JavaScript fuera del navegador. Se utiliza para crear aplicaciones web escalables y de alto rendimiento.
+```
 
-- [Express](https://expressjs.com/es/): Express es un marco de aplicación web para Node.js que facilita la creación de servidores web y API. Ofrece características como el enrutamiento, el manejo de errores, el middleware y la integración con bases de datos.
+Para iniciar la aplicación:
 
-- [MongoDB Atlas](https://www.mongodb.com/es): MongoDB Atlas es un servicio de base de datos en la nube que ofrece MongoDB, una base de datos NoSQL orientada a documentos. Permite almacenar y consultar datos flexibles y escalables de forma segura y fácil.
+```bash
+npm run dev
 
-- [Tailwind](https://tailwindcss.com/): Tailwind es un marco de CSS que ofrece clases de utilidad personalizables y de bajo nivel para diseñar interfaces de usuario. Permite crear diseños responsivos, adaptables y elegantes sin tener que escribir mucho código CSS.
-    
-## Documentation
+```
 
-- [Figma del proyecto](https://www.figma.com/file/8egjlThhBf3Q9sn1Ky4QKk/Farmacia-Bienestar-Express-S.A?type=design&node-id=7%3A170&mode=design&t=6kEDu9VI2dOnyJfD-1)
+---
 
-## Autores
+## 📄 Documentación y Diseño
 
-- [@mendezleoa](https://www.github.com/mendezleoa) Programador de Backend y la Base de datos.
+Puedes ver el proceso de diseño UI/UX en nuestro Figma:
 
-- [@Joshua-desings](https://github.com/Joshua-desings) Programador de Frontend y diseñador de UI/UX.
+- [🎨 Ver Diseño en Figma](https://www.figma.com/file/8egjlThhBf3Q9sn1Ky4QKk/Farmacia-Bienestar-Express-S.A?type=design&node-id=7%3A170&mode=design&t=6kEDu9VI2dOnyJfD-1)
+
+---
+
+## 👤 Autor
+
+Este proyecto fue desarrollado con ❤️ por:
+
+- [@JoshuaFreelancer](https://github.com/Joshua-desings) | 🔧 FullStack Developer
