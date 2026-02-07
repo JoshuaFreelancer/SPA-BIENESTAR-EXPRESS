@@ -128,8 +128,8 @@ function ProductForm({ onProductAdded }) {
               <div className="relative bg-white rounded-xl shadow-2xl border border-gray-100 font-kodchasan">
                 
                 {/* Header */}
-                <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50 rounded-t-xl">
-                  <h3 className="text-xl font-bold text-gray-800">
+                <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-primary-800 rounded-t-xl">
+                  <h3 className="text-xl font-bold text-white">
                     Agregar Nuevo Producto
                   </h3>
                   <button 
@@ -258,7 +258,7 @@ function ProductForm({ onProductAdded }) {
                     <button 
                       type="submit" 
                       disabled={isLoading}
-                      className={`text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center shadow-lg shadow-primary-200 transition-transform active:scale-95 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      className={`text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center  ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                       {isLoading ? 'Subiendo...' : 'Guardar Producto'}
                     </button>

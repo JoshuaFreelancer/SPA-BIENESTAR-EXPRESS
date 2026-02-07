@@ -7,7 +7,6 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const RegisterForm = ({ showModal, setShowModal, switchToLogin }) => {
   const { values, handleChange, resetForm } = useForm({
     fullName: "",
-    username: "",
     email: "",
     password: "",
   });
@@ -32,7 +31,6 @@ const RegisterForm = ({ showModal, setShowModal, switchToLogin }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: values.fullName,
-          username: values.username,
           email: values.email,
           password: values.password,
         }),

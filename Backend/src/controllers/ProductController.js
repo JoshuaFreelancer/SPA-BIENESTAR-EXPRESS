@@ -18,54 +18,66 @@ const productSchemaValidation = Joi.object({
  * Obtener productos con Paginación, Filtros y Búsqueda
  */
 const getAllProducts = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const filter = req.query.filter || "all";
-    const search = req.query.search || "";
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const filter = req.query.filter || 'all'; 
+        const search = req.query.search || '';
 
-    const skip = (page - 1) * limit;
-    let query = {};
+        const skip = (page - 1) * limit;
+        let query = {};
+        let sort = { createdAt: -1 }; // Por defecto: Los más nuevos primero
 
-    // 1. Aplicar Filtros
-    switch (filter) {
-      case "low_stock":
-        query.stock = { $lt: 10, $gt: 0 };
-        break;
-      case "out_of_stock":
-        query.stock = 0;
-        break;
-      case "high_price":
-        query.price = { $gt: 50 };
-        break;
+        // 1. FILTROS MEJORADOS
+        switch (filter) {
+            case 'low_stock':
+                // Farmacia: Stock crítico es menos de 5 unidades
+                query.stock = { $lt: 5, $gt: 0 }; 
+                break;
+            case 'out_of_stock':
+                query.stock = 0;
+                break;
+            case 'expensive':
+                // Productos costosos (ajusta el valor según tu moneda)
+                query.price = { $gt: 50 };
+                break;
+            case 'cheap':
+                // Productos económicos / Genericos baratos
+                query.price = { $lt: 10 }; 
+                break;
+            case 'oldest':
+                // Ordenar por antigüedad (para ver qué no se vende)
+                sort = { createdAt: 1 };
+                break;
+            // 'all' y 'recent' usan el default
+        }
+
+        // 2. Búsqueda
+        if (search) {
+            query.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { category: { $regex: search, $options: 'i' } },
+                { brand: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        const total = await Product.countDocuments(query);
+        
+        const products = await Product.find(query)
+            .sort(sort) // Aplicamos el ordenamiento dinámico
+            .skip(skip)
+            .limit(limit);
+
+        res.status(200).json({
+            ok: true,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+            data: products
+        });
+    } catch (error) {
+        res.status(500).json({ ok: false, message: error.message });
     }
-
-    // 2. Aplicar Búsqueda (Search)
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { category: { $regex: search, $options: "i" } },
-        { brand: { $regex: search, $options: "i" } }, // Agregué búsqueda por marca también
-      ];
-    }
-
-    const total = await Product.countDocuments(query);
-
-    const products = await Product.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    res.status(200).json({
-      ok: true,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-      data: products,
-    });
-  } catch (error) {
-    res.status(500).json({ ok: false, message: error.message });
-  }
 };
 
 /**
