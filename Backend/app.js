@@ -8,12 +8,34 @@ const app = express();
  * Configuración de Middlewares
  */
 
-// CORS: Permitir peticiones desde el frontend (idealmente desde variable de entorno)
-const corsOptions = {
-  origin: process.env.CLIENT_URL || "http://localhost:3001",
-  optionsSuccessStatus: 200,
-};
-app.use(cors(corsOptions));
+// 🚀 Lista estricta de dominios permitidos leídos del .env
+const allowedOrigins = [
+  process.env.CLIENT_URL_DEV,     
+  process.env.CLIENT_URL_PREVIEW,  
+  process.env.CLIENT_URL_PROD,     
+  process.env.CLIENT_URL_PROD_ALT  
+].filter(Boolean);
+
+// 🛡️ CORS a prueba de balas (Nivel Producción)
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // 1. Permitir peticiones sin 'origin' (útil para pruebas en Postman)
+      if (!origin) return callback(null, true);
+
+      // 2. Verificar si el origen está en nuestra lista VIP
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        // 3. Si falla, registramos exactamente qué URL intentó entrar en los logs de Render
+        console.error(`🚨 CORS bloqueó la petición desde: ${origin}`);
+        callback(new Error("Acceso denegado por CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    credentials: true, // Vital si en algún momento usas cookies o sesiones
+  })
+);
 
 // Express Body Parser (Nativo desde v4.16+)
 // Reemplaza a la librería externa 'body-parser'
